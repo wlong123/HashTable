@@ -25,19 +25,19 @@ private void rehash()
 Doubles the size of the HashTable and rehashes each item contained within. Should be called anytime calling the put function makes the current fill of the HashTable exceed the load factor.
 	@version 9/29/15
 	@author Will Long
-*
-public class HashTable
+*/
+public class HashTable<K,V>
 {
 	private static final double LoadFactor = .6;
 	private int occupied;
-	private Object[] HashTable;
+	private Entry<K,V>[] HashTable;
 	
 	/**
 	default constructor
 	*/
 	public HashTable()
 	{
-		HashTable = new Object[100];
+		HashTable = new Entry[100];
 		occupied = 0;
 	}
 	
@@ -55,9 +55,10 @@ public class HashTable
 	puts an inputted object into its spot in the hashtable. If that spot is taken, the object is put in the next available spot. 
 	@param obj takes in any object
 	*/
-	public void put(Object obj)
+	public void put(K key, V value)
 	{
-		int spot = obj.hashCode() % HashTable.length;
+		Entry entry = new Entry(K,V);
+		int spot = key.hashCode() % HashTable.length;
 		while(spot < HashTable.length)
 		{
 			if(HashTable[spot] == null)
@@ -117,6 +118,26 @@ public class HashTable
 			if(Temporary[i] != null);
 				HashTable[i] = Temporary[i];
 		}
+	}
+	
+	public V remove(K key)
+	{
+		int spot = key.hashCode() % length;
+		for(int i = 0; i < hashtable.length();i++)
+		{
+			if(spot == hashtable[i])
+			{
+				hashtable[i] = 0;
+				return hashtable[i].key;
+			}
+		}
+		
+	}
+	
+	private class Entry<K,V>
+	{
+		public K key;
+		public V value;
 	}
 }
 
