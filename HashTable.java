@@ -1,28 +1,5 @@
 /**
-	Hash Table Project
-For this project, you will be creating a simple HashTable object.
-
-API - Version 0
-
-This version of HashTable will do a simple put using an object's hashcode. It does not use separate key and value objects. Create the appropriate private fields and set a default load factor.
-
-HashTable()
-
-Default constructor. Initializes to capacity 100.
-
-HashTable(int capacity)
-
-public void put(Object obj)
-
-Puts the object in the hashtable. Deals with collisions by placing the object in the next open spot (OR ask John Lima for an even better way of finding an open spot!).
-
-public String toString()
-
-String representation of the HashTable.
-
-private void rehash()
-
-Doubles the size of the HashTable and rehashes each item contained within. Should be called anytime calling the put function makes the current fill of the HashTable exceed the load factor.
+	Hashtable object that creates a hashtable using a key and a value.
 	@version 9/29/15
 	@author Will Long
 */
@@ -47,23 +24,22 @@ public class HashTable<K,V>
 	*/
 	public HashTable(int capacity)
 	{
-		HashTable = new Object[capacity];
+		HashTable = new Entry[capacity];
 		occupied = 0;
 	}
 	
 	/**
 	puts an inputted object into its spot in the hashtable. If that spot is taken, the object is put in the next available spot. 
-	@param obj takes in any object
+	@param obj Object to be hashed and added to hashtable
 	*/
 	public void put(K key, V value)
 	{
-		Entry entry = new Entry(K,V);
 		int spot = key.hashCode() % HashTable.length;
 		while(spot < HashTable.length)
 		{
 			if(HashTable[spot] == null)
 			{
-				HashTable[spot] = obj.hashCode();
+				HashTable[spot] = new Entry(key, value);
 				spot+=HashTable.length + 1;
 				occupied += 1;
 			}
@@ -104,40 +80,63 @@ public class HashTable<K,V>
 	*/
 	public void rehash()
 	{
-		//temporary arra is occupied with all vlaues of hashtable
-		Object[] Temporary = new Object[HashTable.length]; 
-		for(int i = 0; i < Temporary.length;i++)
+		//temporary array is occupied with all vlaues of hashtable
+		Entry[] temporary = new Entry[HashTable.length]; 
+		for(int i = 0; i < temporary.length;i++)
 		{
 			if(HashTable[i] != null)
-				Temporary[i] = HashTable[i];
+				temporary[i] = HashTable[i];
 		}
 		//create new hashtable which is occupied with values in temporary array
-		HashTable = new Object[HashTable.length * 2];
-		for(int i =0; i < Temporary.length; i++)
+		HashTable = new Entry[HashTable.length * 2];
+		for(int i =0; i < temporary.length; i++)
 		{
-			if(Temporary[i] != null);
-				HashTable[i] = Temporary[i];
+			if(temporary[i] != null);
+				put((K) temporary[i].key, (V) temporary[i].value);
 		}
 	}
 	
 	public V remove(K key)
 	{
-		int spot = key.hashCode() % length;
-		for(int i = 0; i < hashtable.length();i++)
+		int spot = key.hashCode() % HashTable.length;
+		for(int i = 0; i < HashTable.length;i++)
 		{
-			if(spot == hashtable[i])
+			if(spot == (HashTable[i].key.hashCode() % HashTable.length))
 			{
-				hashtable[i] = 0;
-				return hashtable[i].key;
+				occupied--;
+				V remove = HashTable[i].value;
+				HashTable[i] = null;
+				return remove;
 			}
 		}
+		return null;
+	}
+	/*
+	public V get(K key)
+	{
 		
 	}
 	
+	public boolean containsKey(K key)
+	{
+		
+	}
+	
+	public boolean containsValue(V value)
+	{
+		
+	}
+	
+	*/
 	private class Entry<K,V>
 	{
 		public K key;
 		public V value;
+		public Entry(K k, V v)
+		{
+			key = k;
+			value = v;
+		}
 	}
 }
 
