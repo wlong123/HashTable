@@ -10,11 +10,15 @@ public class HashTableRunner
 		h.put(5, "fifth");
 		h.put(6, "sixth");
 		h.put(7, "seventh");
+		h.put(71,"seventy-one");
 		System.out.println(h.get(1));
 		System.out.println(h.containsKey(1));
 		System.out.println(h.containsKey(8));
 		System.out.println(h.containsValue("first"));
 		System.out.println(h.containsValue("efs"));
+		System.out.println(h.toString());
+		System.out.println(h.remove(1));
+		System.out.println(h.remove(9));
 		System.out.println(h.toString());
 	}
 }

@@ -104,14 +104,24 @@ public class HashTable<K,V>
 	*/
 	public V remove(K key)
 	{
+		boolean duplicate = false; //to check values with the same hashcode
 		int spot = Math.abs(key.hashCode()) % HashTable.length;
 		for(int i = 0; i < HashTable.length;i++)
 		{
-			if(spot == Math.abs(HashTable[i].key.hashCode() % HashTable.length))
+			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode() % HashTable.length)) && (duplicate == false))
 			{
 				occupied--;
 				V remove = HashTable[i].value;
 				HashTable[i] = null;
+				duplicate = true;
+				while((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode())) && (duplicate == true))
+				{
+					K key1 = HashTable[i].key;
+					V value1 = HashTable[i].value;
+					HashTable[i] = null;
+					put(key1, value1);
+					i++;
+				}
 				return remove;
 			}
 		}
