@@ -3,6 +3,7 @@
 	@version 9/29/15
 	@author Will Long
 */
+import java.lang.Math;
 public class HashTable<K,V>
 {
 	private static final double LoadFactor = .6;
@@ -34,7 +35,7 @@ public class HashTable<K,V>
 	*/
 	public void put(K key, V value)
 	{
-		int spot = key.hashCode() % HashTable.length;
+		int spot = Math.abs(key.hashCode()) % HashTable.length;
 		while(spot < HashTable.length)
 		{
 			if(HashTable[spot] == null)
@@ -53,7 +54,7 @@ public class HashTable<K,V>
 		if((float) occupied / (float) HashTable.length >= LoadFactor) //checks if capacity at load factor
 			rehash();
 	}
-	
+
 	/**
 	creates a string representation of the hashtable
 	@return String repreentation of the hashtable
@@ -91,17 +92,22 @@ public class HashTable<K,V>
 		HashTable = new Entry[HashTable.length * 2];
 		for(int i =0; i < temporary.length; i++)
 		{
-			if(temporary[i] != null);
+			if(temporary[i] != null)
 				put((K) temporary[i].key, (V) temporary[i].value);
 		}
 	}
 	
+	/**
+	removes an entry in the hashtable given an inputted key. The value that is associated with the key is removed. If the inputted key isn't in the hashtable, null is returned
+	@param K key that is to be removed from the hashtable
+	@returns V value that is removed from hashtable
+	*/
 	public V remove(K key)
 	{
-		int spot = key.hashCode() % HashTable.length;
+		int spot = Math.abs(key.hashCode()) % HashTable.length;
 		for(int i = 0; i < HashTable.length;i++)
 		{
-			if(spot == (HashTable[i].key.hashCode() % HashTable.length))
+			if(spot == Math.abs(HashTable[i].key.hashCode() % HashTable.length))
 			{
 				occupied--;
 				V remove = HashTable[i].value;
@@ -111,22 +117,63 @@ public class HashTable<K,V>
 		}
 		return null;
 	}
-	/*
+	
+	/**
+	gets a value in the Hashtable given a key. If the key is not in the hashtable, it returns null
+	@param K key whose value is going to be returned.
+	@returns V value that is associated with the inputted key
+	*/
 	public V get(K key)
 	{
-		
+		int spot = Math.abs(key.hashCode()) % HashTable.length;
+		for(int i = 0; i < HashTable.length;i++)
+		{
+			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode()) % HashTable.length))
+			{
+				return HashTable[i].value;
+			}
+		}
+		return null;
 	}
-	
+
+	/**
+	checks if the hashtable contains a given key
+	@param K a key that is checked whether or not it is in the hashtable
+	@returns boolean true if the key is in the table and false if not
+	*/
 	public boolean containsKey(K key)
 	{
-		
+		int spot = Math.abs(key.hashCode()) % HashTable.length;
+		for(int i = 0; i < HashTable.length; i++)
+		{
+			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode()) % HashTable.length))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
+	/**
+	checks if a given value is in the hashtable
+	@param V a value that is checked whether or not it is in the table
+	@returns boolean true if the value is in the table and false if not
+	*/
 	public boolean containsValue(V value)
 	{
-		
+		int spot = Math.abs(value.hashCode()) % HashTable.length;
+		for(int i = 0; i < HashTable.length; i++)
+		{
+			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].value.hashCode()) % HashTable.length))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
+	/**
+	nested class that contains K and V generics which are keys and values
 	*/
 	private class Entry<K,V>
 	{

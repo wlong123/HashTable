@@ -5,6 +5,16 @@ public class HashTableRunner
 		HashTable<Integer, String> h = new HashTable<Integer, String>(10);
 		h.put(1, "first");
 		h.put(2, "second");
+		h.put(3, "third");
+		h.put(4, "fourth");
+		h.put(5, "fifth");
+		h.put(6, "sixth");
+		h.put(7, "seventh");
+		System.out.println(h.get(1));
+		System.out.println(h.containsKey(1));
+		System.out.println(h.containsKey(8));
+		System.out.println(h.containsValue("first"));
+		System.out.println(h.containsValue("efs"));
 		System.out.println(h.toString());
 	}
 }
