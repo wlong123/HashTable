@@ -30,8 +30,9 @@ public class HashTable<K,V>
 	}
 	
 	/**
-	puts an inputted object into its spot in the hashtable. If that spot is taken, the object is put in the next available spot. 
-	@param obj Object to be hashed and added to hashtable
+	puts an entry into the hashtable based on the hashcode of the inputted key. If that spot is taken, the object is put in the next available spot. It also calls rehash if the capacity is above the load factor
+	@param K key that is to be part of the entry added to the hashtable
+	@param V value that is to be part of the entry added to the hashtable
 	*/
 	public void put(K key, V value)
 	{
@@ -48,7 +49,7 @@ public class HashTable<K,V>
 			{
 				spot+=1;
 			}
-			if(spot == HashTable.length)
+			if(spot == HashTable.length) //resets spot to zero if at end of the hashtable
 				spot = 0;
 		}
 		if((float) occupied / (float) HashTable.length >= LoadFactor) //checks if capacity at load factor
@@ -57,7 +58,7 @@ public class HashTable<K,V>
 
 	/**
 	creates a string representation of the hashtable
-	@return String repreentation of the hashtable
+	@return String representation of the hashtable
 	*/
 	public String toString()
 	{
@@ -66,18 +67,18 @@ public class HashTable<K,V>
 		{
 			if(HashTable[i] != null)
 			{
-				s += HashTable[i].hashCode() + ", ";
+				s += "[" + HashTable[i].key + ", " + HashTable[i].value +  ", " + HashTable[i].hashCode() + "], ";
 			}
 			else
 			{
-				s+= "null, ";
+				s+= "[null], ";
 			}
 		}
 		return s;
 	}
 	
 	/**
-	rehashes the hashtable. creates a new hashtable with double the capacity of the old hashtable. The values in the old hashtable are placed into the new hashtable
+	rehashes the hashtable. creates a new hashtable with double the capacity of the old hashtable. all of the entries are then hashed into the hashtable 
 	*/
 	public void rehash()
 	{
@@ -90,7 +91,7 @@ public class HashTable<K,V>
 		}
 		//create new hashtable which is occupied with values in temporary array
 		HashTable = new Entry[HashTable.length * 2];
-		for(int i =0; i < temporary.length; i++)
+		for(int i = 0; i < temporary.length; i++)
 		{
 			if(temporary[i] != null)
 				put((K) temporary[i].key, (V) temporary[i].value);
@@ -98,28 +99,33 @@ public class HashTable<K,V>
 	}
 	
 	/**
-	removes an entry in the hashtable given an inputted key. The value that is associated with the key is removed. If the inputted key isn't in the hashtable, null is returned
+	removes an entry in the hashtable given an inputted key. The first entry that is associated with the key is removed from the hashtable. All other entries with the inputted key are rehashed. If the inputted key isn't in the hashtable, null is returned. 
 	@param K key that is to be removed from the hashtable
-	@returns V value that is removed from hashtable
+	@return V value that is removed from hashtable
 	*/
 	public V remove(K key)
 	{
-		boolean duplicate = false; //to check values with the same hashcode
 		int spot = Math.abs(key.hashCode()) % HashTable.length;
-		for(int i = 0; i < HashTable.length;i++)
+		for(int i = Math.abs(key.hashCode()) % HashTable.length; i < HashTable.length;i++)
 		{
-			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode() % HashTable.length)) && (duplicate == false))
+			if(HashTable[i] == null)
+				return null;
+			else if(spot == Math.abs(HashTable[i].key.hashCode() % HashTable.length))
 			{
 				occupied--;
 				V remove = HashTable[i].value;
 				HashTable[i] = null;
-				duplicate = true;
-				while((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode())) && (duplicate == true))
+				i++;
+				//finds all other entries with same key and rehahses them
+				while(HashTable[i] != null)
 				{
-					K key1 = HashTable[i].key;
-					V value1 = HashTable[i].value;
-					HashTable[i] = null;
-					put(key1, value1);
+					if(spot == Math.abs(HashTable[i].key.hashCode() % HashTable.length))
+					{
+						K key1 = HashTable[i].key;
+						V value1 = HashTable[i].value;
+						HashTable[i] = null;
+						put(key1, value1);
+					}
 					i++;
 				}
 				return remove;
@@ -131,14 +137,18 @@ public class HashTable<K,V>
 	/**
 	gets a value in the Hashtable given a key. If the key is not in the hashtable, it returns null
 	@param K key whose value is going to be returned.
-	@returns V value that is associated with the inputted key
+	@return V value that is associated with the inputted key
 	*/
 	public V get(K key)
 	{
 		int spot = Math.abs(key.hashCode()) % HashTable.length;
-		for(int i = 0; i < HashTable.length;i++)
+		for(int i = Math.abs(key.hashCode()) % HashTable.length; i < HashTable.length;i++)
 		{
-			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode()) % HashTable.length))
+			if(HashTable[i] == null)
+			{
+				return null;
+			}
+			else if(spot == Math.abs(HashTable[i].key.hashCode()) % HashTable.length)
 			{
 				return HashTable[i].value;
 			}
@@ -149,25 +159,19 @@ public class HashTable<K,V>
 	/**
 	checks if the hashtable contains a given key
 	@param K a key that is checked whether or not it is in the hashtable
-	@returns boolean true if the key is in the table and false if not
+	@return boolean true if the key is in the table and false if not
 	*/
 	public boolean containsKey(K key)
 	{
-		int spot = Math.abs(key.hashCode()) % HashTable.length;
-		for(int i = 0; i < HashTable.length; i++)
-		{
-			if((HashTable[i] != null) && (spot == Math.abs(HashTable[i].key.hashCode()) % HashTable.length))
-			{
-				return true;
-			}
-		}
-		return false;
+		if(get(key) == null) 
+			return false;
+		return true;
 	}
 	
 	/**
 	checks if a given value is in the hashtable
 	@param V a value that is checked whether or not it is in the table
-	@returns boolean true if the value is in the table and false if not
+	@return boolean true if the value is in the table and false if not
 	*/
 	public boolean containsValue(V value)
 	{
